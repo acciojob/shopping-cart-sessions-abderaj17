@@ -1,7 +1,4 @@
-// This is the boilerplate code given for you
-// You can modify this code
-// Product data
-	let cart = [];
+
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -9,79 +6,55 @@ const products = [
   { id: 4, name: "Product 4", price: 40 },
   { id: 5, name: "Product 5", price: 50 },
 ];
-
+let cart = sessionStorage.getItem("cart")?JSON.parse(sessionStorage.getItem("cart")):[]
+ 
+ 
 // DOM elements
+let cartList = document.getElementById("cart-list")
 const productList = document.getElementById("product-list");
-
+ 
 // Render product list
 function renderProducts() {
   products.forEach((product) => {
     const li = document.createElement("li");
-    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
+    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}" onclick="addToCart(${product.id})">Add to Cart</button>`;
     productList.appendChild(li);
   });
 }
-
+ 
 // Render cart list
 function renderCart() {
-	const cartList = document.getElementById("cart-list");
-
-	cartList.innerHTML ='';
-	cart.forEach((productId)=>{
-		const product = products.find((product)=> product.id== productId);
-
-		const li = document.createElement("li");
-		li.innerHTML = `${product.name} - $${product.price} <button class="remove-from-cart-btn" data-id="${product.id}">Remove</button>`;
-
-		cartList.appendChild(li);
-	});
-	let buttons = document.getElementsByClassName('remove-from-cart-btn');
-	for(let i = 0; i<buttons.length; i++){
-		buttons[i].addEventListener('click', function(){
-	let productId = this.getAttribute('data-id');
-			removeFromCart(productId);
-		})
-	}
+	cartList.innerHTML = ""
+	cart.forEach((product) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}" onclick="removeFromCart(${product.id})">Remove from Cart</button>`;
+    cartList.appendChild(li);
+  });
+	sessionStorage.setItem("cart",JSON.stringify(cart))
 }
-
+ 
 // Add item to cart
-function addToCart() {
-	let buttons = document.getElementsByClassName('add-to-cart-btn');
-	for(let i = 0; i<buttons.length; i++){
-		buttons[i].addEventListener('click', function(){
-			let productId = this.getAttribute('data-id');
-			const ulList = document.getElementById('cart-list');
-				console.log(`Product ${productId} added to cart.`)
-			cart.push(productId);
-			renderCart();
-		});
-	}
-} 
-
+function addToCart(productId) {
+  let product = products.find(product => product.id === productId);
+  if (product) {
+    cart.push(product);
+    renderCart();
+  }
+ 
+}
+ 
 // Remove item from cart
 function removeFromCart(productId) {
-	// renderCart();
-	let index = cart.indexOf(productId);
-
-	if(index !== -1){
-		cart.splice(index, 1);
-	}
-	renderCart();
-	
+	cart = cart.filter((ele)=>ele.id !== productId)
+	renderCart()
 }
-
+ 
 // Clear cart
 function clearCart() {
-	const clearBtn = document.getElementById('clear-cart-btn');
-	clearBtn.addEventListener('click', ()=>{
-		cart=[];
-		renderCart();		
-	})
+	cart = []
+	renderCart()
 }
-
+ 
 // Initial render
-
 renderProducts();
-addToCart();
 renderCart();
-clearCart();
